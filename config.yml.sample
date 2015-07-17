@@ -4,13 +4,6 @@ connections:
         host: irc.host.name
         port: 6667
         nickname: bridge
-    # hipchat api rete limit is 100/5min
-    # So, we not suggest using hipchat api method
-    #hipchat_api:
-    #    type: hipchat
-    #    token: "HIPCHAT_TOKEN"
-    #    ignores:
-    #        - my_mention_name
     hipchat_xmpp:
         type: hipchat_xmpp
         username: "XMPP_USER_NAME"
@@ -22,6 +15,3 @@ bridge:
     -
         some_irc: "#test"
         hipchat_xmpp: "test_room"
-    #-
-    #    test_server: "#test2"
-    #    hipchat: 12341234
