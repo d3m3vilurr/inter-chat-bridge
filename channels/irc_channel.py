@@ -29,8 +29,9 @@ class IRCRoom(Room):
         self.queue.append((sender, message))
 
     def send_message(self, sender, message):
-        self.conn.privmsg(self.roomid,
-                          ('<%s> %s' % (sender, message)))
+        for line in message.split('\n'):
+            self.conn.privmsg(self.roomid,
+                              ('<%s> %s' % (sender, line.rstrip())))
 
 
 class IRC(object):
