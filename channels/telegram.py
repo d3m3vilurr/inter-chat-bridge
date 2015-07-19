@@ -43,10 +43,10 @@ class Telegram(Channel):
             s = msg.sender
             username = s.get('username', None) \
                     or s.get('print_name', None) \
-                    or '_'.join((s.first_name, s.last_name))
-            print 'sender', username
-            print 'event', msg.event
-            print 'receiver', msg.receiver.cmd
+                    or '_'.join(filter(None, (s.first_name, s.last_name)))
+            #print 'sender', username
+            #print 'event', msg.event
+            #print 'receiver', msg.receiver.cmd
             room = self.rooms.get(msg.receiver.cmd, None)
             if not room:
                 continue
