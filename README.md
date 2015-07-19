@@ -19,6 +19,6 @@ pip install irc
 
 ### Hipchat
 ```bash
-pip install hippy
+pip install hippybot
 pip install https://github.com/ArchipelProject/xmpppy/archive/master.tar.gz --upgrade
 ```
