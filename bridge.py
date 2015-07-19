@@ -24,13 +24,19 @@ for mapping in config['bridge']:
         rooms.append(connections[k].join(v))
 
 # mainloop
-while True:
-    time.sleep(1)
-    for bridge in bridges:
-        for room in bridge:
-            for sender, message in room.fetch_messages():
-                for receiver in bridge:
-                    # prevent echo
-                    if receiver == room:
-                        continue
-                    receiver.send_message(sender, message)
+try:
+    while True:
+        time.sleep(1)
+        for bridge in bridges:
+            for room in bridge:
+                for sender, message in room.fetch_messages():
+                    for receiver in bridge:
+                        # prevent echo
+                        if receiver == room:
+                            continue
+                        receiver.send_message(sender, message)
+except KeyboardInterrupt:
+    print 'die'
+    for k, conn in connections.iteritems():
+        conn.close()
+

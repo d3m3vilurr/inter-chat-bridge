@@ -85,3 +85,5 @@ class Hipchat(object):
         self.rooms[channel] = room
         return room
 
+    def close(self):
+        pass

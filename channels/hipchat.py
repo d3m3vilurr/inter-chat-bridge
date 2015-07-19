@@ -100,3 +100,6 @@ class Hipchat(object):
 
     def join(self, roomid):
         return HipchatRoom(self, str(roomid))
+
+    def close(self):
+        pass

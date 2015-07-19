@@ -64,3 +64,6 @@ class IRC(object):
         self.client.join(roomid)
         room = self.rooms[roomid] = IRCRoom(self.client, roomid)
         return room
+
+    def close(self):
+        pass
