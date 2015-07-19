@@ -1,6 +1,7 @@
 import thread
 from pytg import Telegram as CLI
 from pytg.utils import coroutine
+from pytg.exceptions import IllegalResponseException
 from channels import Channel, Room
 
 
@@ -29,7 +30,10 @@ class Telegram(Channel):
     def handle(self, sender):
         while True:
             msg = (yield)
-            sender.status_online()
+            try:
+                sender.status_online()
+            except IllegalResponseException:
+                print 'status_online raised exception'
             #print 'dump', msg
             if msg.event != 'message':
                 continue
