@@ -15,6 +15,9 @@ for k, v in config['connections'].iteritems():
         from channels.hipchat_xmpp import Hipchat as HipchatXMPP
         connections[k] = HipchatXMPP(v['username'], v['password'],
                                      v['nickname'], v['default_room'])
+    elif v['type'] == 'telegram':
+        from channels.telegram import Telegram
+        connections[k] = Telegram(v['cli'], v['pubkey'])
 
 bridges = []
 for mapping in config['bridge']:

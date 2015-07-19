@@ -10,8 +10,16 @@ connections:
         password: "XMPP_USER_PASSWORD"
         nickname: "HIPCHAT NICKNAME"
         default_room: "HIPCHAT_ROOM_NAME"
+    telegrem:
+        type: telegrem
+        cli: /path/to/tg/bin/telegrem-cli
+        key: /path/to/tg/tg-server.pub
 
 bridge:
     -
         some_irc: "#test"
         hipchat_xmpp: "test_room"
+
+    -
+        some_irc: "#telegram"
+        telegram: "chat#12341234"
