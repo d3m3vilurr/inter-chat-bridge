@@ -59,6 +59,8 @@ class IRC(object):
             room.append_message(event.source, message)
 
     def join(self, roomid):
+        if not self.ready:
+            time.sleep(1)
         self.client.join(roomid)
         room = self.rooms[roomid] = IRCRoom(self.client, roomid)
         return room
