@@ -3,12 +3,9 @@ try:
     import simplejson as json
 except ImportError:
     import json
+from channels import Channel, Room
 
 HIPCHAT_API = 'https://api.hipchat.com/v2/'
-
-
-class Room(object):
-    pass
 
 
 class HipchatRoom(Room):
@@ -56,7 +53,7 @@ class HipchatRoom(Room):
         users = [(x['id'], x['mention_name'], x['name']) for x in api_result.get('items', [])]
         return users
 
-class Hipchat(object):
+class Hipchat(Channel):
     def __init__(self, token, ignores=None):
         self.token = token
         self.ignores = ignores or []
@@ -100,6 +97,3 @@ class Hipchat(object):
 
     def join(self, roomid):
         return HipchatRoom(self, str(roomid))
-
-    def close(self):
-        pass

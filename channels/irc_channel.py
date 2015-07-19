@@ -1,29 +1,14 @@
 import irc.client
 import thread
 import time
+from channels import Channel, Room
 
-
-class Room(object):
-    def fetch_messages(self):
-        pass
-
-    def send_message(self, sender, message):
-        pass
-
-    def users(self):
-        pass
 
 class IRCRoom(Room):
     def __init__(self, connection, roomid):
         self.queue = []
         self.conn = connection
         self.roomid = roomid
-
-    def fetch_messages(self):
-        # flush
-        msgs = self.queue
-        self.queue = []
-        return msgs
 
     def append_message(self, sender, message):
         self.queue.append((sender, message))
@@ -34,8 +19,7 @@ class IRCRoom(Room):
                               ('<%s> %s' % (sender, line.rstrip())))
 
 
-class IRC(object):
-
+class IRC(Channel):
     def __init__(self, host, port=6667, nickname='bridge'):
         self.reactor = irc.client.Reactor()
         self.ready = False
@@ -64,6 +48,3 @@ class IRC(object):
         self.client.join(roomid)
         room = self.rooms[roomid] = IRCRoom(self.client, roomid)
         return room
-
-    def close(self):
-        pass

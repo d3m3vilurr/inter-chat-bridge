@@ -1,10 +1,7 @@
 import thread
 from pytg import Telegram as CLI
 from pytg.utils import coroutine
-
-
-class Room(object):
-    pass
+from channels import Channel, Room
 
 
 class TencentRoom(Room):
@@ -13,21 +10,14 @@ class TencentRoom(Room):
         self.sender = sender
         self.roomid = roomid
 
-    def fetch_messages(self):
-        # flush
-        msgs = self.queue
-        self.queue = []
-        return msgs
-
     def append_message(self, sender, message):
         self.queue.append((sender, message))
 
     def send_message(self, sender, message):
-        print sender, message
         self.sender.send_msg(self.roomid, message)
 
 
-class Telegram(object):
+class Telegram(Channel):
     def __init__(self, cli, key):
         self.rooms = {}
         self.cli = CLI(telegram=cli, pubkey_file=key)

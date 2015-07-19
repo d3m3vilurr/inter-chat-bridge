@@ -1,22 +1,13 @@
 # coding: utf8
 import hippybot.bot
 import thread
-
-class Room(object):
-    pass
-
+from channels import Channel, Room
 
 class HipchatRoom(Room):
     def __init__(self, hippy, roomid):
         self.queue = []
         self.hippy = hippy
         self.roomid = roomid
-
-    def fetch_messages(self):
-        # flush
-        msgs = self.queue
-        self.queue = []
-        return msgs
 
     def append_message(self, sender, message):
         self.queue.append((sender, message))
@@ -25,7 +16,7 @@ class HipchatRoom(Room):
         #print sender, message
         self.hippy.send(self.roomid, message, message_type='groupchat')
 
-class Hipchat(object):
+class Hipchat(Channel):
     def __init__(self, username, password, nickname, default_room):
         self.prefix = username.split('_')[0]
         self.nickname = nickname
@@ -59,12 +50,6 @@ class Hipchat(object):
             return
         room.append_message(sender, body)
 
-    def get(self, api, params=None):
-        pass
-
-    def post(self, api, data=None, params=None):
-        pass
-
     def rooms(self):
         api_result = self.get('/room', params={'max-results': 1000})
         rooms = [(x['id'], x['name']) for x in api_result.get('items', [])]
@@ -84,6 +69,3 @@ class Hipchat(object):
         room = HipchatRoom(self.hippy, channel)
         self.rooms[channel] = room
         return room
-
-    def close(self):
-        pass
