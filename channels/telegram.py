@@ -50,19 +50,21 @@ class Telegram(Channel):
             room = self.rooms.get(msg.receiver.cmd, None)
             if not room:
                 continue
-            if msg.get('media', None):
-                print 'media', msg.media.type
+            if msg.get('text', None):
+                room.append_message(username, msg.text)
+            elif msg.get('media', None):
                 print 'media download not support yet'
-                print msg.id
+                print msg
                 #if msg.media.type == 'photo':
                 #    print self.cli.sender.load_photo(msg.id)
                 #    {u'result': u'/home/d3m3vilurr/.telegram-cli/downloads/download_702222016_26560.jpg', u'event': u'download'}
                 #if msg.media.type == 'document':
                 #    print self.cli.sender.load_document(msg.id)
                 #...
-                room.append_message(username, 'send media data ' + msg.media.type)
+                room.append_message(username, 'send media data: ' + msg.media.type)
             else:
-                room.append_message(username, msg.text)
+                print msg
+                room.append_message(username, 'send unknown type message')
 
     def join(self, roomid):
         room = self.rooms[roomid] = TencentRoom(self.cli.sender, str(roomid))
