@@ -4,6 +4,15 @@ import time
 from channels import Channel, Room
 
 
+def chunks(l, n):
+    """Yield successive n-sized chunks from l.
+
+    http://stackoverflow.com/a/312464
+    """
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
+
 class IRCRoom(Room):
     def __init__(self, connection, roomid):
         self.queue = []
@@ -14,9 +23,14 @@ class IRCRoom(Room):
         self.queue.append((sender, message))
 
     def send_message(self, sender, message):
+        # IRC line must be 512 bytes.
+        # One UTF-8 character can be 1~4 bytes
+        line_limit = 128 - (len(sender) + 3)
         for line in message.split('\n'):
-            self.conn.privmsg(self.roomid,
-                              ('<%s> %s' % (sender, line.rstrip())))
+            line = line.rstrip()
+            for s in chunks(line, line_limit):
+                self.conn.privmsg(self.roomid,
+                                  ('<%s> %s' % (sender, s)))
 
 
 class IRC(Channel):
