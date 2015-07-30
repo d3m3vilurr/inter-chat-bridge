@@ -4,13 +4,23 @@ import time
 from channels import Channel, Room
 
 
-def chunks(l, n):
-    """Yield successive n-sized chunks from l.
-
-    http://stackoverflow.com/a/312464
+def chunks(s, n):
     """
-    for i in xrange(0, len(l), n):
-        yield l[i:i+n]
+    http://stackoverflow.com/a/6044299
+    """
+    assert n >= 4
+    start = 0
+    lens = len(s)
+    while start < lens:
+        if lens - start <= n:
+            yield s[start:]
+            return # StopIteration
+        end = start + n
+        while '\x80' <= s[end] <= '\xBF':
+            end -= 1
+        assert end > start
+        yield s[start:end]
+        start = end
 
 
 class IRCRoom(Room):
@@ -25,7 +35,8 @@ class IRCRoom(Room):
     def send_message(self, sender, message):
         # IRC line must be 512 bytes.
         # One UTF-8 character can be 1~4 bytes
-        line_limit = 128 - (len(sender) + 3)
+        sender_length = len(sender.encode('utf-8'))
+        line_limit = 512 - (sender_length + 3)
         for line in message.split('\n'):
             line = line.rstrip()
             for s in chunks(line, line_limit):
