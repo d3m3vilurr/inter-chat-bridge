@@ -71,4 +71,4 @@ class Telegram(Channel):
         return room
 
     def close(self):
-        self.cli.receiver.stop()
+        self.cli.stopCLI()
