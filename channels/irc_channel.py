@@ -28,6 +28,8 @@ class IRCRoom(Room):
         self.queue = []
         self.conn = connection
         self.roomid = roomid
+        # PRIVMSG #CHAN_NAME :MSGMSG\r\n
+        self.privmsg_length = 12 + len(self.roomid.encode('utf-8'))
 
     def append_message(self, sender, message):
         self.queue.append((sender, message))
@@ -36,12 +38,12 @@ class IRCRoom(Room):
         # IRC line must be 512 bytes.
         # One UTF-8 character can be 1~4 bytes
         sender_length = len(sender.encode('utf-8'))
-        line_limit = 512 - (sender_length + 3)
-        for line in message.split('\n'):
-            line = line.rstrip()
-            for s in chunks(line, line_limit):
+        line_limit = 512 - self.privmsg_length - (sender_length + 3)
+        for line in message.split(u'\n'):
+            line = line.rstrip().encode('utf-8')
+            for c in chunks(line, line_limit):
                 self.conn.privmsg(self.roomid,
-                                  ('<%s> %s' % (sender, s)))
+                                  ('<%s> %s' % (sender, c.decode('utf-8'))))
 
 
 class IRC(Channel):
