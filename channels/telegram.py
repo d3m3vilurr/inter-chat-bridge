@@ -5,7 +5,7 @@ from pytg.exceptions import IllegalResponseException
 from channels import Channel, Room
 
 
-class TencentRoom(Room):
+class TelegramRoom(Room):
     def __init__(self, sender, roomid):
         self.queue = []
         self.sender = sender
@@ -67,7 +67,7 @@ class Telegram(Channel):
                 room.append_message(username, 'send unknown type message')
 
     def join(self, roomid):
-        room = self.rooms[roomid] = TencentRoom(self.cli.sender, str(roomid))
+        room = self.rooms[roomid] = TelegramRoom(self.cli.sender, str(roomid))
         return room
 
     def close(self):
