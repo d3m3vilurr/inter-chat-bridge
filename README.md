@@ -29,6 +29,6 @@ Check issue 1stvamp/hippybot#18
 ```bash
 pip install https://github.com/luckydonald/pytg/archive/master.tar.gz
 ```
-`pytg` require installed [telegrem-cli][https://github.com/vysheng/tg]
+`pytg` require installed [telegrem-cli](https://github.com/vysheng/tg)
 
 You need chat room's id. `chat_info` command will print this.
