@@ -20,7 +20,7 @@ pip install irc
 ### Hipchat
 ```bash
 pip install hippybot
-pip install https://github.com/ArchipelProject/xmpppy/archive/master.tar.gz --upgrade
+pip install https://github.com/normanr/xmpppy/archive/master.tar.gz --upgrade
 ```
 Old `xmpppy` was not work on to python 2.7.9.
 Check issue 1stvamp/hippybot#18
