@@ -1,6 +1,8 @@
 # coding: utf8
 import hippybot.bot
 import thread
+import time
+import xmpp
 from channels import Channel, Room
 
 class HipchatRoom(Room):
@@ -19,8 +21,31 @@ class HipchatRoom(Room):
 
 class HippyBot(hippybot.bot.HippyBot):
 
-    def idle_proc(self):
-        self._idle_ping()
+    def __init__(self, config):
+        super(HippyBot, self).__init__(config)
+
+    def _idle_ping(self):
+        # copy from jabberbot
+        if self.PING_FREQUENCY \
+            and time.time() - self._last_send_time > self.PING_FREQUENCY:
+            self._last_send_time = time.time()
+            #logging.debug('Pinging the server.')
+            ping = xmpp.Protocol('iq', typ='get', \
+                                 payload=[xmpp.Node('ping', attrs={'xmlns':'urn:xmpp:ping'})])
+            try:
+                res = self.conn.SendAndWaitForResponse(ping, self.PING_TIMEOUT)
+                print res
+                #logging.debug('Got response: ' + str(res))
+                if res is None:
+                    self.on_ping_timeout()
+            except IOError, e:
+                #logging.error('Error pinging the server: %s, '\
+                #              'treating as ping timeout.' % e)
+                self.on_ping_timeout()
+
+    def on_ping_timeout(self):
+        self.quit()
+        raise IOError('hipchat disconnected')
 
 
 class Hipchat(Channel):
