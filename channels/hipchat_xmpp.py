@@ -16,6 +16,13 @@ class HipchatRoom(Room):
         #print sender, message
         self.hippy.send(self.roomid, message, message_type='groupchat')
 
+
+class HippyBot(hippybot.bot.HippyBot):
+
+    def idle_proc(self):
+        self._idle_ping()
+
+
 class Hipchat(Channel):
     def __init__(self, username, password, nickname, default_room):
         self.prefix = username.split('_')[0]
@@ -29,7 +36,7 @@ class Hipchat(Channel):
                 'nickname': nickname,
             }
         }
-        self.hippy = hippybot.bot.HippyBot(config)
+        self.hippy = HippyBot(config)
         self.hippy._all_msg_handlers.append(self.handle)
         self.rooms = {}
         self.join(default_room, initialize=True)
