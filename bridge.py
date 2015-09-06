@@ -38,8 +38,13 @@ try:
                         if receiver == room:
                             continue
                         receiver.send_message(sender, message)
+        if filter(lambda x: not x.connected, connections.itervalues()):
+            raise IOError('Connection closed')
 except KeyboardInterrupt:
     print 'die'
-    for k, conn in connections.iteritems():
+    for conn in connections.itervalues():
         conn.close()
-
+except IOError:
+    print 'die'
+    for conn in connections.itervalues():
+        conn.close()

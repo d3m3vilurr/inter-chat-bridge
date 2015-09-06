@@ -20,6 +20,7 @@ class TelegramRoom(Room):
 
 class Telegram(Channel):
     def __init__(self, cli, key):
+        super(Telegram, self).__init__()
         self.rooms = {}
         self.cli = CLI(telegram=cli, pubkey_file=key)
         self.cli.receiver.start()

@@ -48,6 +48,7 @@ class IRCRoom(Room):
 
 class IRC(Channel):
     def __init__(self, host, port=6667, nickname='bridge'):
+        super(IRC, self).__init__()
         self.reactor = irc.client.Reactor()
         self.ready = False
         server = self.reactor.server()

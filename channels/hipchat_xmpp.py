@@ -21,8 +21,9 @@ class HipchatRoom(Room):
 
 class HippyBot(hippybot.bot.HippyBot):
 
-    def __init__(self, config):
+    def __init__(self, controller, config):
         super(HippyBot, self).__init__(config)
+        self.controller = controller
 
     def _idle_ping(self):
         # copy from jabberbot
@@ -45,11 +46,12 @@ class HippyBot(hippybot.bot.HippyBot):
 
     def on_ping_timeout(self):
         self.quit()
-        raise IOError('hipchat disconnected')
+        self.controller.connected = False
 
 
 class Hipchat(Channel):
     def __init__(self, username, password, nickname, default_room):
+        super(Hipchat, self).__init__()
         self.prefix = username.split('_')[0]
         self.nickname = nickname
         config = {
@@ -61,7 +63,7 @@ class Hipchat(Channel):
                 'nickname': nickname,
             }
         }
-        self.hippy = HippyBot(config)
+        self.hippy = HippyBot(self, config)
         self.hippy._all_msg_handlers.append(self.handle)
         self.rooms = {}
         self.join(default_room, initialize=True)

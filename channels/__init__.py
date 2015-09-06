@@ -13,6 +13,10 @@ class Room(object):
 
 
 class Channel(object):
+    def __init__(self):
+        super(Channel, self).__init__()
+        self.connected = True
+
     def join(self, roomid):
         pass
 
