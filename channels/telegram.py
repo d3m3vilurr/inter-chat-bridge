@@ -19,9 +19,10 @@ class TelegramRoom(Room):
 
 
 class Telegram(Channel):
-    def __init__(self, cli, key):
+    def __init__(self, cli, key, photo_service):
         super(Telegram, self).__init__()
         self.rooms = {}
+        self.photo_service = photo_service
         self.cli = CLI(telegram=cli, pubkey_file=key)
         self.cli.receiver.start()
         thread.start_new_thread(self.cli.receiver.message,
@@ -54,11 +55,15 @@ class Telegram(Channel):
             if msg.get('text', None):
                 room.append_message(username, msg.text)
             elif msg.get('media', None):
-                print 'media download not support yet'
+                if not self.photo_service:
+                    print 'disabled photo_service'
+                if msg.media.type == 'photo':
+                    photo = self.cli.sender.load_photo(msg.id)
+                    photo_url = self.photo_service.post(photo['result'],
+                                                        room.roomid)
+                    room.append_message(username, photo_url)
+                    return
                 print msg
-                #if msg.media.type == 'photo':
-                #    print self.cli.sender.load_photo(msg.id)
-                #    {u'result': u'/home/d3m3vilurr/.telegram-cli/downloads/download_702222016_26560.jpg', u'event': u'download'}
                 #if msg.media.type == 'document':
                 #    print self.cli.sender.load_document(msg.id)
                 #...

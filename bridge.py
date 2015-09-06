@@ -3,6 +3,13 @@ import yaml
 
 with open('config.yml') as r:
     config = yaml.safe_load(r)
+    photo_config = config.get('photo', {})
+    photo_service = None
+    if photo_config.get('use'):
+        import photos
+        photo_service = photos.Picasa(photo_config['account'],
+                                      photo_config['client_secret'],
+                                      photo_config['credentials_dat'])
 connections = {}
 for k, v in config['connections'].iteritems():
     if v['type'] == 'irc':
@@ -17,7 +24,7 @@ for k, v in config['connections'].iteritems():
                                      v['nickname'], v['default_room'])
     elif v['type'] == 'telegram':
         from channels.telegram import Telegram
-        connections[k] = Telegram(v['cli'], v['pubkey'])
+        connections[k] = Telegram(v['cli'], v['pubkey'], photo_service)
 
 bridges = []
 for mapping in config['bridge']:
