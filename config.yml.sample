@@ -23,3 +23,13 @@ bridge:
     -
         some_irc: "#telegram"
         telegram: "chat#12341234"
+
+# only use telegram service
+photo:
+    use: false
+    # need install gdata, oauth2client
+    service: picasa
+    account: gmail_account@gmail.com
+    # generate google dev console
+    client_secret: /path/to/google/client_secret.json
+    credentials_dat: /path/to/google/credentials.dat
