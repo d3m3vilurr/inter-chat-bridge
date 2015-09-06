@@ -65,12 +65,13 @@ class Picasa(object):
         photo_entry.summary = atom.Summary(text='', summary_type='text')
         photo = self.client.InsertPhoto(album_url, photo_entry, image_path,
                                         content_type)
-        if not photo.link or not len(photo.link):
-            return 'not found link'
-        for link in photo.link:
-            if 'lh/photo' in link.href:
-                return link.href
-        return 'not found link'
+        image_url = photo.GetMediaURL()
+        if not image_url:
+            return 'not found image link'
+        paths = image_url.split('/')
+        paths.insert(len(paths) - 1, 's0')
+        return '/'.join(paths)
+
 
 if __name__ == '__main__':
     if not os.path.exists('client_secret.json'):
@@ -78,4 +79,4 @@ if __name__ == '__main__':
     email = raw_input('Enter your email address: ').strip()
     c = Picasa(email, 'client_secret.json', 'gauth_credentials.dat')
     image_path = raw_input('Enter image path: ').strip()
-    c.post(image_path)
+    print c.post(image_path)
