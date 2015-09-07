@@ -57,16 +57,19 @@ class Telegram(Channel):
             elif msg.get('media', None):
                 if not self.photo_service:
                     print 'disabled photo_service'
+                    print msg
+                    room.append_message(username, 'send media data: ' + msg.media.type)
+                    return
                 if msg.media.type == 'photo':
                     photo = self.cli.sender.load_photo(msg.id)
                     photo_url = self.photo_service.post(photo['result'],
                                                         room.roomid)
                     room.append_message(username, photo_url)
                     return
-                print msg
                 #if msg.media.type == 'document':
                 #    print self.cli.sender.load_document(msg.id)
                 #...
+                print msg
                 room.append_message(username, 'send media data: ' + msg.media.type)
             else:
                 print msg
