@@ -35,7 +35,6 @@ class HippyBot(hippybot.bot.HippyBot):
                                  payload=[xmpp.Node('ping', attrs={'xmlns':'urn:xmpp:ping'})])
             try:
                 res = self.conn.SendAndWaitForResponse(ping, self.PING_TIMEOUT)
-                print res
                 #logging.debug('Got response: ' + str(res))
                 if res is None:
                     self.on_ping_timeout()
