@@ -15,9 +15,9 @@ PICASA_REDIRECT_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
 class Picasa(object):
     def __init__(self, email, client_secret, credentials_dat):
-        storage = Storage(credentials_dat)
-        credentials = storage.get()
-        if credentials is None or credentials.invalid:
+        self._storage = Storage(credentials_dat)
+        self._credentials = self._storage.get()
+        if self._credentials is None or self._credentials.invalid:
             flow = flow_from_clientsecrets(client_secret,
                                            scope=PICASA_OAUTH_SCOPE,
                                            redirect_uri=PICASA_REDIRECT_URI)
@@ -25,21 +25,26 @@ class Picasa(object):
             print 'open to browser:'
             print uri
             code = raw_input('Enter the authentication code: ').strip()
-            credentials = flow.step2_exchange(code)
-        if (credentials.token_expiry - datetime.utcnow()) < timedelta(minutes=5):
-            http = httplib2.Http()
-            http = credentials.authorize(http)
-            credentials.refresh(http)
-        storage.put(credentials)
+            self._credentials = flow.step2_exchange(code)
         client = PhotosService()
         client.email = email
         client.source = 'inter-chat-bridge'
-        client.additional_headers = \
-            dict(Authorization='Bearer %s' % credentials.access_token)
         self.client = client
         self.albums = {}
+        self._refresh_auth_token()
+
+    def _refresh_auth_token(self):
+        if (self._credentials.token_expiry - datetime.utcnow()) < \
+                timedelta(minutes=5):
+            http = httplib2.Http()
+            http = credentials.authorize(http)
+            self._credentials.refresh(http)
+        self._storage.put(self._credentials)
+        self.client.additional_headers['Authorization'] = \
+            'Bearer %s' % self._credentials.access_token
 
     def _find_or_create_album(self, name):
+        self._refresh_auth_token()
         albums = self.client.GetUserFeed()
         for album in albums.entry:
             if album.title.text == name:
@@ -48,6 +53,7 @@ class Picasa(object):
                                        access='protected')
 
     def post(self, image_path, album='inter-chat-bridge'):
+        self._refresh_auth_token()
         _album = self.albums.get(album)
         if not _album:
             _album = self._find_or_create_album(album)
