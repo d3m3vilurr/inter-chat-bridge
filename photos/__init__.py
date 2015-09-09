@@ -37,7 +37,7 @@ class Picasa(object):
         if (self._credentials.token_expiry - datetime.utcnow()) < \
                 timedelta(minutes=5):
             http = httplib2.Http()
-            http = credentials.authorize(http)
+            http = self._credentials.authorize(http)
             self._credentials.refresh(http)
         self._storage.put(self._credentials)
         self.client.additional_headers['Authorization'] = \
