@@ -1,5 +1,4 @@
 import irc.client
-import thread
 import time
 from channels import Channel, Room
 
@@ -55,7 +54,7 @@ class IRC(Channel):
         self.client = server.connect(host, int(port), nickname)
         self.reactor.add_global_handler('all_events', self.handle, -10)
         self.rooms = {}
-        thread.start_new_thread(self.reactor.process_forever, ())
+        self.future = self.executor.submit(self.reactor.process_forever)
 
     def handle(self, connection, event):
         #print event.type, event.arguments, event.target, event.source

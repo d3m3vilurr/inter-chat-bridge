@@ -1,7 +1,7 @@
-import thread
 from pytg import Telegram as CLI
 from pytg.utils import coroutine
 from pytg.exceptions import IllegalResponseException
+from concurrent.futures import ThreadPoolExecutor
 from channels import Channel, Room
 
 
@@ -17,6 +17,10 @@ class TelegramRoom(Room):
     def send_message(self, sender, message):
         self.sender.send_msg(self.roomid, message)
 
+def telegram_receiver_start(self):
+    # XXX: pytg thread cannot handle
+    self._receiver_executor = ThreadPoolExecutor(max_workers=1)
+    self._receiver_future = self._receiver_executor.submit(self._receiver)
 
 class Telegram(Channel):
     def __init__(self, cli, key, photo_service):
@@ -24,9 +28,9 @@ class Telegram(Channel):
         self.rooms = {}
         self.photo_service = photo_service
         self.cli = CLI(telegram=cli, pubkey_file=key)
-        self.cli.receiver.start()
-        thread.start_new_thread(self.cli.receiver.message,
-                                (self.handle(self.cli.sender),))
+        telegram_receiver_start(self.cli.receiver)
+        self.future = self.executor.submit(self.cli.receiver.message,
+                                           self.handle(self.cli.sender))
 
     @coroutine
     def handle(self, sender):
@@ -79,5 +83,17 @@ class Telegram(Channel):
         room = self.rooms[roomid] = TelegramRoom(self.cli.sender, str(roomid))
         return room
 
+    def alive(self):
+        if not self.cli.receiver._receiver_future.running():
+            return False
+        return super(Telegram, self).alive()
+
     def close(self):
-        self.cli.stopCLI()
+        # tg cli force kill
+        if self.cli._proc:
+            try:
+                self.cli._proc.kill()
+            except:
+                print 'foo'
+                pass
+        super(Telegram, self).close()

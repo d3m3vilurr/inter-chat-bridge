@@ -1,3 +1,4 @@
+import os
 import time
 import yaml
 
@@ -50,13 +51,16 @@ def mainloop(connections, bridges):
                             if receiver == room:
                                 continue
                             receiver.send_message(sender, message)
-            if filter(lambda x: not x.connected, connections.itervalues()):
-                raise IOError('Connection closed')
+            for conn in connections.itervalues():
+                if conn.alive():
+                    continue
+                conn.result()
+                raise IOError('some connection closed')
     except KeyboardInterrupt:
-        print 'die'
+        print 'interrupt'
         for conn in connections.itervalues():
             conn.close()
-    except IOError:
+    except:
         print 'die'
         for conn in connections.itervalues():
             conn.close()
@@ -66,3 +70,6 @@ with open('config.yml') as r:
     conns = create_connections(config)
     bridges = do_mapping(conns, config)
     mainloop(conns, bridges)
+    # suicide
+    time.sleep(1)
+    os.kill(0, 9)

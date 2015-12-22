@@ -1,6 +1,5 @@
 # coding: utf8
 import hippybot.bot
-import thread
 import time
 import xmpp
 from channels import Channel, Room
@@ -45,7 +44,7 @@ class HippyBot(hippybot.bot.HippyBot):
 
     def on_ping_timeout(self):
         self.quit()
-        self.controller.connected = False
+        raise IOError('ping timeout')
 
 
 class Hipchat(Channel):
@@ -66,7 +65,7 @@ class Hipchat(Channel):
         self.hippy._all_msg_handlers.append(self.handle)
         self.rooms = {}
         self.join(default_room, initialize=True)
-        thread.start_new_thread(self.hippy.serve_forever, ())
+        self.future = self.executor.submit(self.hippy.serve_forever)
 
     def handle(self, message):
         body = message.getBody()
