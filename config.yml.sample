@@ -14,6 +14,9 @@ connections:
         type: telegrem
         cli: /path/to/tg/bin/telegrem-cli
         key: /path/to/tg/tg-server.pub
+    slack:
+        type: slack
+        token: xoxp-1234123412-12341234123-12341234123-1234123412
 
 bridge:
     -
@@ -23,6 +26,10 @@ bridge:
     -
         some_irc: "#telegram"
         telegram: "chat#12341234"
+
+    -
+        some_irc: "#slack"
+        slack: "#slack"
 
 # only use telegram service
 photo:

@@ -28,6 +28,9 @@ def create_connections(config):
         elif v['type'] == 'telegram':
             from channels.telegram import Telegram
             connections[k] = Telegram(v['cli'], v['pubkey'], photo_service)
+        elif v['type'] == 'slack':
+            from channels.slack import Slack
+            connections[k] = Slack(v['token'])
     return connections
 
 def do_mapping(connections, config):
@@ -36,7 +39,10 @@ def do_mapping(connections, config):
         rooms = []
         bridges.append(rooms)
         for k, v in mapping.iteritems():
-            rooms.append(connections[k].join(v))
+            room = connections[k].join(v)
+            if not room:
+                continue
+            rooms.append(room)
     return bridges
 
 def mainloop(connections, bridges):
