@@ -65,7 +65,8 @@ def mainloop(connections, bridges):
         for conn in connections.itervalues():
             conn.close()
 
-with open('config.yml') as r:
+CONFIG_FILE = os.environ.get('INTER_CHAT_BRIDGE_CONF', 'config.yml')
+with open(CONFIG_FILE) as r:
     config = yaml.safe_load(r)
     conns = create_connections(config)
     bridges = do_mapping(conns, config)
