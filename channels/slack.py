@@ -48,8 +48,7 @@ class Slack(Channel):
         self.client = SlackClient(token)
         self.rooms = {}
         self.reconnect()
-        #self.ignore = self.client.server.users.find(self.client.server.username).id
-        self.ignore = ''
+        self.ignore = self.client.server.users.find(self.client.server.username).id
 
     def reconnect(self):
         return self.client.rtm_connect()
