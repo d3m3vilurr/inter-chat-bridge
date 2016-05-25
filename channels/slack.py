@@ -21,7 +21,7 @@ class SlackRoom(Room):
         self.slack.fetch_messages()
         return super(SlackRoom, self).fetch_messages()
 
-    def append_message(self, sender, message):
+    def append_message(self, sender, message, orig_data):
         user = self.slack.client.server.users.find(sender)
         if user:
             sender = user.name
@@ -36,6 +36,13 @@ class SlackRoom(Room):
                 c = '#' + _.name
             message = message.replace(t, c)
         for t, u, a in URL_REGEX.findall(message):
+            if orig_data.get('subtype'):
+                if orig_data['subtype'] == 'file_share' and \
+                        orig_data.get('file'):
+                    file_data = orig_data['file']
+                    u = file_data.get('url_private') or \
+                            file_data.get('url_private_download') or \
+                            u
             message = message.replace(t, u + ' ' + a)
         message = unescape(message)
         self.queue.append((sender, message))
@@ -88,7 +95,7 @@ class Slack(Channel):
                            msg.get('comment', {}).get('user') or '_'
                     if user == self.ignore:
                         continue
-                    room.append_message(user, msg.get('text', ''))
+                    room.append_message(user, msg.get('text', ''), msg)
                 else:
                     print 'UNKNOWN_SLACK_MSG', msg
 
