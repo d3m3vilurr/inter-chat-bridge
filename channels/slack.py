@@ -69,16 +69,26 @@ class SlackRoom(Room):
             c = self.find_roomname(c)
             message = message.replace(t, c)
         for t, u, a in RECV_URL_REGEX.findall(message):
-            if orig_data.get('subtype'):
-                if orig_data['subtype'] == 'file_share' and \
-                        orig_data.get('file'):
-                    file_data = orig_data['file']
-                    u = file_data.get('url_private') or \
-                            file_data.get('url_private_download') or \
-                            u
+            if orig_data.get('subtype') == 'file_share' and \
+                    orig_data.get('file'):
+                file_data = orig_data['file']
+                u = file_data.get('url_private') or \
+                        file_data.get('url_private_download') or \
+                        u
             message = message.replace(t, u + ' ' + a)
         message = unescape(message)
-        self.queue.append((sender, message))
+        if message:
+            self.queue.append((sender, message))
+        if orig_data.get('attachments'):
+            for attachment in orig_data['attachments']:
+                if attachment.get('title'):
+                    self.append_message(sender, attachment['title'], {})
+                text = ' '.join((attachment.get('image_url', ''),
+                                 attachment.get('text', '')))
+                text = text.strip()
+                if not text:
+                    continue
+                self.append_message(sender, text, {})
 
     def send_message(self, sender, message):
         message = escape(message)
@@ -131,7 +141,8 @@ class Slack(Channel):
                         continue
                     #print 'DEBUG_SLACK_RECV_MSG', msg
                     user = msg.get('user') or msg.get('username') or \
-                           msg.get('comment', {}).get('user') or '_'
+                           msg.get('comment', {}).get('user') or \
+                           msg.get('bot_id') or '_'
                     if user == self.ignore:
                         continue
                     room.append_message(user, msg.get('text', ''), msg)
