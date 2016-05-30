@@ -41,6 +41,7 @@ class SlackRoom(Room):
     def find_userid(self, username):
         _ = self.slack.client.server.users.find(username)
         return '@' + (_ and _.id or username)
+
     def find_username(self, userid):
         _ = self.slack.client.server.users.find(userid)
         return '@' + (_ and _.name or userid)
@@ -121,6 +122,8 @@ class Slack(Channel):
                 if msg['type'] == 'presence_change':
                     continue
                 if msg['type'] == 'reconnect_url':
+                    continue
+                if msg['type'] == 'user_typing':
                     continue
                 if msg['type'] == 'message':
                     room = self.rooms.get(msg['channel'])
