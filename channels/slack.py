@@ -85,7 +85,7 @@ class SlackRoom(Room):
                     self.append_message(sender, attachment['title'], {})
                 text = ' '.join((attachment.get('image_url', ''),
                                  attachment.get('text', '')))
-                text = text.strip()
+                text = text.strip() or attachment.get('fallback', '').strip()
                 if not text:
                     continue
                 self.append_message(sender, text, {})
