@@ -4,9 +4,10 @@ from html.parser import HTMLParser
 import cgi
 from channels import Channel, Room
 
-SEND_USER_REGEX = re.compile('(@([a-zA-Z0-9]+))')
+HERE_REGEX = re.compile('(@(here))')
+SEND_USER_REGEX = re.compile('(@([a-zA-Z0-9\-]+))')
 SEND_ROOM_REGEX = re.compile('(#([_\-a-zA-Z0-9]+))')
-RECV_USER_REGEX = re.compile('(<@([a-zA-Z0-9]+)(|[^>]+)?>)')
+RECV_USER_REGEX = re.compile('(<@([a-zA-Z0-9\-]+)(|[^>]+)?>)')
 RECV_ROOM_REGEX = re.compile('(<#([_\-a-zA-Z0-9]+)(|[^>]+)?>)')
 RECV_URL_REGEX = re.compile('(<([^>|]+)(|[^>]+)?>)')
 
@@ -92,6 +93,7 @@ class SlackRoom(Room):
 
     def send_message(self, sender, message):
         message = escape(message)
+        message = to_send_format(message, HERE_REGEX, lambda x: '!here')
         message = to_send_format(message, SEND_USER_REGEX, self.find_userid)
         message = to_send_format(message, SEND_ROOM_REGEX, self.find_roomid)
         #print('DEBUG_SLACK_SEND_MSG', message)
