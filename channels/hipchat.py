@@ -68,7 +68,7 @@ class Hipchat(Channel):
             data = json.loads(ret.text)
             return data
         if ret.status_code == 429:
-            print 'exceed api limit'
+            print('exceed api limit')
         raise Exception
 
     def post(self, api, data=None, params=None):

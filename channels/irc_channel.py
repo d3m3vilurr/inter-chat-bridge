@@ -57,10 +57,10 @@ class IRC(Channel):
         self.future = self.executor.submit(self.reactor.process_forever)
 
     def handle(self, connection, event):
-        #print event.type, event.arguments, event.target, event.source
+        #print(event.type, event.arguments, event.target, event.source)
         if event.type == 'welcome':
             self.ready = True
-        #print event, dir(event)
+        #print(event, dir(event))
         if event.type == 'pubmsg':
             room = self.rooms.get(event.target, None)
             if not room:

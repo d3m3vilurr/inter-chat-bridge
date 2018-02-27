@@ -22,8 +22,8 @@ class Picasa(object):
                                            scope=PICASA_OAUTH_SCOPE,
                                            redirect_uri=PICASA_REDIRECT_URI)
             uri = flow.step1_get_authorize_url()
-            print 'open to browser:'
-            print uri
+            print('open to browser:')
+            print(uri)
             code = raw_input('Enter the authentication code: ').strip()
             self._credentials = flow.step2_exchange(code)
         client = PhotosService()
@@ -85,4 +85,4 @@ if __name__ == '__main__':
     email = raw_input('Enter your email address: ').strip()
     c = Picasa(email, 'client_secret.json', 'gauth_credentials.dat')
     image_path = raw_input('Enter image path: ').strip()
-    print c.post(image_path)
+    print(c.post(image_path))

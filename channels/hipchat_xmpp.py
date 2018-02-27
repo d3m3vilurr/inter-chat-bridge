@@ -14,7 +14,7 @@ class HipchatRoom(Room):
         self.queue.append((sender, message))
 
     def send_message(self, sender, message):
-        #print sender, message
+        #print(sender, message)
         self.hippy.send(self.roomid, message, message_type='groupchat')
 
 

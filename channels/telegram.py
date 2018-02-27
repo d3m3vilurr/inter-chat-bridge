@@ -39,8 +39,8 @@ class Telegram(Channel):
             try:
                 sender.status_online()
             except IllegalResponseException:
-                print 'status_online raised exception'
-            #print 'dump', msg
+                print('status_online raised exception')
+            #print('dump', msg)
             if msg.event != 'message':
                 continue
             if msg.own:
@@ -50,9 +50,9 @@ class Telegram(Channel):
             username = s.get('username', None) \
                     or s.get('print_name', None) \
                     or '_'.join(filter(None, (s.first_name, s.last_name)))
-            #print 'sender', username
-            #print 'event', msg.event
-            #print 'receiver', msg.receiver.cmd
+            #print('sender', username)
+            #print('event', msg.event)
+            #print('receiver', msg.receiver.cmd)
             room = self.rooms.get(msg.receiver.cmd, None)
             if not room:
                 continue
@@ -60,8 +60,8 @@ class Telegram(Channel):
                 room.append_message(username, msg.text)
             elif msg.get('media', None):
                 if not self.photo_service:
-                    print 'disabled photo_service'
-                    print msg
+                    print('disabled photo_service')
+                    print(msg)
                     room.append_message(username, 'send media data: ' + msg.media.type)
                     continue
                 if msg.media.type == 'photo':
@@ -71,12 +71,12 @@ class Telegram(Channel):
                     room.append_message(username, photo_url)
                     continue
                 #if msg.media.type == 'document':
-                #    print self.cli.sender.load_document(msg.id)
+                #    print(self.cli.sender.load_document(msg.id))
                 #...
-                print msg
+                print(msg)
                 room.append_message(username, 'send media data: ' + msg.media.type)
             else:
-                print msg
+                print(msg)
                 room.append_message(username, 'send unknown type message')
 
     def join(self, roomid):
@@ -94,6 +94,6 @@ class Telegram(Channel):
             try:
                 self.cli._proc.kill()
             except:
-                print 'foo'
+                print('foo')
                 pass
         super(Telegram, self).close()

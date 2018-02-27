@@ -14,7 +14,7 @@ def get_photo_service(config):
 def create_connections(config):
     photo_service = get_photo_service(config)
     connections = {}
-    for k, v in config['connections'].iteritems():
+    for k, v in config['connections'].items():
         if v['type'] == 'irc':
             from channels.irc_channel import IRC
             connections[k] = IRC(v['host'], v['port'], v['nickname'])
@@ -38,7 +38,7 @@ def do_mapping(connections, config):
     for mapping in config['bridge']:
         rooms = []
         bridges.append(rooms)
-        for k, v in mapping.iteritems():
+        for k, v in mapping.items():
             room = connections[k].join(v)
             if not room:
                 continue
@@ -57,18 +57,23 @@ def mainloop(connections, bridges):
                             if receiver == room:
                                 continue
                             receiver.send_message(sender, message)
-            for conn in connections.itervalues():
+            for conn in connections.values():
                 if conn.alive():
                     continue
                 conn.result()
                 raise IOError('some connection closed')
     except KeyboardInterrupt:
-        print 'interrupt'
-        for conn in connections.itervalues():
+        print('interrupt')
+        for conn in connections.values():
+            conn.close()
+    except Exception as e:
+        print(e.args)
+        print('die')
+        for conn in connections.values():
             conn.close()
     except:
-        print 'die'
-        for conn in connections.itervalues():
+        print('die')
+        for conn in connections.values():
             conn.close()
 
 CONFIG_FILE = os.environ.get('INTER_CHAT_BRIDGE_CONF', 'config.yml')

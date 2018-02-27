@@ -1,6 +1,6 @@
 from slackclient import SlackClient
 import re
-import HTMLParser
+from html.parser import HTMLParser
 import cgi
 from channels import Channel, Room
 
@@ -11,7 +11,7 @@ RECV_ROOM_REGEX = re.compile('(<#([_\-a-zA-Z0-9]+)(|[^>]+)?>)')
 RECV_URL_REGEX = re.compile('(<([^>|]+)(|[^>]+)?>)')
 
 escape = cgi.escape
-unescape = HTMLParser.HTMLParser().unescape
+unescape = HTMLParser().unescape
 
 def to_send_format(msg, pattern, process):
     tmp = msg
@@ -94,29 +94,41 @@ class SlackRoom(Room):
         message = escape(message)
         message = to_send_format(message, SEND_USER_REGEX, self.find_userid)
         message = to_send_format(message, SEND_ROOM_REGEX, self.find_roomid)
-        #print 'DEBUG_SLACK_SEND_MSG', message
+        #print('DEBUG_SLACK_SEND_MSG', message)
         self.slack.client.rtm_send_message(self.channel.id, message)
 
 class Slack(Channel):
     def __init__(self, token):
         self.client = SlackClient(token)
         self.rooms = {}
-        self.reconnect()
-        self.ignore = self.client.server.users.find(self.client.server.username).id
+        print('try first connection')
+        if not self.reconnect():
+            print('cannot connect slack rtm')
+        try:
+            self.ignore = self.client.server.users.find(self.client.server.username).id
+        except AttributeError:
+            print('Cannot found user', self.client.server.username)
+            self.ignore = ''
+
 
     def reconnect(self):
         return self.client.rtm_connect()
 
     def join(self, roomname):
         channel = self.client.server.channels.find(roomname)
+        #print(roomname, channel)
         if not channel:
             return
         room = self.rooms[channel.id] = SlackRoom(self, channel)
         return room
 
     def alive(self):
-        if not self.client.server.websocket.connected:
-            self.reconnect()
+        if (not self.client
+                or not self.client.server
+                or not self.client.server.websocket
+                or not self.client.server.websocket.connected):
+            if not self.reconnect():
+                return False
         return self.client.server.websocket.connected
 
     def fetch_messages(self):
@@ -139,7 +151,7 @@ class Slack(Channel):
                     room = self.rooms.get(msg['channel'])
                     if not room:
                         continue
-                    #print 'DEBUG_SLACK_RECV_MSG', msg
+                    print('DEBUG_SLACK_RECV_MSG', msg)
                     user = msg.get('user') or msg.get('username') or \
                            msg.get('comment', {}).get('user') or \
                            msg.get('bot_id') or '_'
@@ -147,7 +159,7 @@ class Slack(Channel):
                         continue
                     room.append_message(user, msg.get('text', ''), msg)
                 else:
-                    print 'UNKNOWN_SLACK_RECV_MSG', msg
+                    print('UNKNOWN_SLACK_RECV_MSG', msg)
 
     def close(self):
         pass
