@@ -149,6 +149,12 @@ class Slack(Channel):
                     continue
                 if msg['type'] == 'user_typing':
                     continue
+                if msg['type'] == 'user_change':
+                    continue
+                if msg['type'] == 'reaction_added':
+                    continue
+                if msg['type'] == 'dnd_updated_user':
+                    continue
                 if msg['type'] == 'message':
                     room = self.rooms.get(msg['channel'])
                     if not room:
